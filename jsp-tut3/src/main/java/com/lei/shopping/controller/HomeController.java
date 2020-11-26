@@ -32,26 +32,15 @@ public class HomeController extends HttpServlet{
 	@Override
 	public void init() throws ServletException {
 		EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-		if(null == emf) {
-			emf= Persistence.createEntityManagerFactory("lei-os");
-			
-			getServletContext().setAttribute("emf", emf);
-		}
 		
-		CategoryService catService = new CategoryService(emf.createEntityManager());
+		
 		proService = new ProductService(emf.createEntityManager());
 		salService = new SaleService(emf.createEntityManager());
 		
-		getServletContext().setAttribute("categories", catService.getAll());
+		
 	}
 	
-	@Override
-	public void destroy() {
-		EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-		if(null != emf && emf.isOpen()) {
-			emf.close();
-		}
-	}
+
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -84,7 +73,7 @@ public class HomeController extends HttpServlet{
 		
 		if(null != sale && sale.getTotal() >0) {
 			salService.save(sale);
-			session.removeAttribute("cart");;
+			session.invalidate();
 		}
 	}
 	resp.sendRedirect(req.getContextPath().concat("/home"));
